@@ -5,3 +5,16 @@ var images = [
 	"testing/red.png"
 ];
 
+var image_elements = [];
+
+for (var i = 0; i < images.length; i++) {
+	var new_image = document.createElement("IMG");
+	new_image.src = "res/images/" + images[i];
+
+	/* add CSS to make hidden */
+	new_image.style.display = "none";
+
+	document.body.appendChild(new_image);
+	image_elements.push(new_image);
+}
+

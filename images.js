@@ -12,6 +12,7 @@ for (var i = 0; i < images.length; i++) {
 	new_image.src = "res/images/" + images[i];
 
 	/* add CSS to make hidden */
+	new_image.style.display = "none";
 
 	document.body.appendChild(new_image);
 	image_elements.push(new_image);

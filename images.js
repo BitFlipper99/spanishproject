@@ -44,8 +44,8 @@ for (var i = 0; i < images.length; i++) {
 }
 
 
-var guatheight = 1600;
-var guatwidth = 1348;
+var guatheight = 1600*0.75;
+var guatwidth = 1348*0.75;
 /* Initialize circles */
 var circles = [
 	{ color: "red", x: 750/1348*guatwidth, y: 400/1600*guatheight, size: 30, id: "Flores"},
@@ -87,7 +87,6 @@ function showImage(imgId, height, width, y, x) {
 
 }
 
-//showImage("guatemala", guatheight, guatwidth, 0, 0)
 
 function showRepeating(imgId, height, width, x, y){
 
@@ -95,12 +94,24 @@ function showRepeating(imgId, height, width, x, y){
 
 }
 
-/*
-for (var i = 0; i < circles.length; i++){
-	var town = document.getElementById(circles[i].id);
-	town.style.display = "inline";
+
+
+function startgame(){
+	var disabled = ["starttext", "startbutton", "introtext", "farmercat"];
+
+	for (var i = 0; i < disabled.length; i++){
+		var temp = document.getElementById(disabled[i]);
+		temp.style.display = "none";
+	}
+
+	showImage("guatemala", guatheight, guatwidth, 0, 0);
+	for (var i = 0; i < circles.length; i++){
+		var town = document.getElementById(circles[i].id);
+		town.style.display = "inline";
+	}
+
+
 }
-*/
 
 
 
@@ -115,8 +126,33 @@ function begingame(){
 	intro.style.fontSize = "150px";
 	intro.innerHTML = "Bienvenido!";
 	intro.style.left = "100px";
-	intro.style.position = "fixed";
+	intro.style.position = "absolute";
+	intro.style.fontWeight = "bold";
+	intro.id = "introtext";
+
+	var startbutton = document.createElement("BUTTON");
+	startbutton.classList.add('mybutton');
+	startbutton.style.top = "280px";
+	startbutton.style.left = "110px";
+	startbutton.id = "startbutton";
+
+	var starttext = document.createElement("DIV");
+	starttext.style.color = "red";
+	starttext.style.fontSize = "60px";
+	starttext.innerHTML = "Comienza";
+	starttext.style.left = "30px";
+	starttext.style.top = "200px";
+	starttext.style.position = "absolute";
+	starttext.style.fontWeight = "bold";
+	starttext.id = "starttext";
+
+
+	
+	document.body.appendChild(startbutton);
+	startbutton.addEventListener("click", startgame);
 	document.body.appendChild(intro);
+	document.body.appendChild(starttext);
+
 
 
 }

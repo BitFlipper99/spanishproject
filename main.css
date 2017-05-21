@@ -10,6 +10,10 @@ body {
 	background-color: gray;
 }
 
-.mytext{
-	color: green;
+.mybutton{
+	position: fixed;
+	display: block;
+	height: 60px;
+	width: 140px;
+	z-index: 1000;
 }

@@ -1,20 +1,20 @@
 var images = [
-	{name: "guatemala", extension: "png"},
-	{name: "banana", extension: "png"},
-	{name: "beans", extension: "png"},
-	{name: "cacao", extension: "png"},
-	{name: "coffee", extension: "png"},
-	{name: "corn", extension: "png"},
-	{name: "cotton", extension: "png"},
-	{name: "female_farmer", extension: "png"},
-	{name: "hemp", extension: "png"},
-	{name: "male_farmer", extension: "png"},
-	{name: "sugarcane", extension: "png"},
-	{name: "cloud", extension: "png"},
-	{name: "farmercat", extension: "gif"},
-	{name: "cities/coban", extension: "jpg"},
-	{name: "cities/sanpedrocarcha", extension: "jpg"},
-	{name: "cities/guatemalatemple", extension: "jpg"}
+	{name: "guatemalamap", extension: "png", width: 674, height: 800},
+	{name: "banana", extension: "png", width: 300, height: 261},
+	{name: "beans", extension: "png", width: 320, height: 355},
+	{name: "cacao", extension: "png", width: 412, height: 329},
+	{name: "coffee", extension: "png", width: 600, height: 312},
+	{name: "corn", extension: "png", width: 448, height: 314},
+	{name: "cotton", extension: "png", width: 567, height: 560},
+	{name: "female_farmer", extension: "png", width: 312, height: 500},
+	{name: "hemp", extension: "png", width: 600, height: 601},
+	{name: "male_farmer", extension: "png", width: 340, height: 500},
+	{name: "sugarcane", extension: "png", width: 552, height: 598},
+	{name: "cloud", extension: "png", width: 600, height: 326},
+	{name: "farmercat", extension: "gif", width: 720, height: 404},
+	{name: "cities/coban", extension: "jpg", width: 640, height: 480},
+	{name: "cities/sanpedrocarcha", extension: "jpg", width: 500, height: 375},
+	{name: "cities/guatemalatemple", extension: "jpg", width: 2477, height: 1393}
 ];
 
 var deviceScale = 1;
@@ -25,6 +25,8 @@ for (var i = 0; i < images.length; i++) {
 	var new_image = document.createElement("IMG");
 	new_image.src = "res/images/" + images[i].name + "." + images[i].extension;
 	new_image.id = images[i].name;
+	new_image.width = images[i].width;
+	new_image.height = images[i].height;
 	new_image.style.display = "none";
 	new_image.style.position = "fixed";
 	document.body.appendChild(new_image);
@@ -76,12 +78,14 @@ function disableDOMs(domarr){
 	}
 }
 
-function showImage(imgId, height, width, y, x) {
+function showImage(imgId, imgScale, x, y) {
 
 	var image = document.getElementById(imgId);
 
-	image.width = width*deviceScale;
-	image.height = height*deviceScale;
+	console.log(image.width);
+
+	image.style.width = image.width*deviceScale*imgScale+"px";
+	image.style.height = image.height*deviceScale*imgScale+"px";
 	image.style.top = y*deviceScale+"px";
 	image.style.left = x*deviceScale+"px";
 
@@ -126,7 +130,7 @@ function tick(){
 
 
 	/* Display guatemala + nodes
-	showImage("guatemala", guatheight, guatwidth, 0, 0);
+	showImage("guatemala", 1, 0, 0);
 	for (var i = 0; i < circles.length; i++){
 		var town = document.getElementById(circles[i].id);
 		town.style.display = "inline";
@@ -137,7 +141,7 @@ function run(){
 
 	setInterval(function() { tick(); }, 50);
 
-
+	console.log(test)
 }
 
 function startgame(male){
@@ -146,7 +150,7 @@ function startgame(male){
 
 	disableDOMs(["starttext", "malebutton", "femalebutton", "introtext", "farmercat"]);
 
-	showImage("cities/guatemalatemple", 1393*0.5, 2477*0.5, 0, 0);
+	showImage("cities/guatemalatemple", 0.5, 0, 0);
 	displayText("welcometext", "Bienvenido a Guatemala!", 70, 100, 550, true, "white");
 	displayButton("continuetogamebutton", "Continuar", 650, 75, "black");
 
@@ -192,7 +196,7 @@ function displayButton(id, text, x, y, color){
 
 function begingame(){
 
-	showImage("farmercat", 404*1.5, 720*1.5, 160, 0);
+	showImage("farmercat", 1.5, 0, 160);
 
 	displayText("introtext", "Bienvenido!", 150, 100, 0, true, "blue");
 	displayText("starttext",

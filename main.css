@@ -16,4 +16,6 @@ body {
 	height: 60px;
 	width: 140px;
 	z-index: 1000;
+	color: black;
+	font-size: 26px;
 }

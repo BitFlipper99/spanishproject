@@ -92,15 +92,24 @@ function displayText(id, text, size, x, y, isBold, color){
 	document.body.appendChild(sampleText);
 }
 
-function displayButton(id, text, x, y, color){
+function displayButton(id, text, x, y, color, big){
 	var sampleButton = document.createElement("BUTTON");
+
+	if (big){
+		sampleButton.style.fontSize = 26*deviceScale+"px";
+		sampleButton.style.height = 60*deviceScale+"px";
+		sampleButton.style.width = 140*deviceScale+"px";
+	}
+	else {
+		sampleButton.style.fontSize = 16.9*deviceScale+"px";
+		sampleButton.style.height = 39*deviceScale+"px";
+		sampleButton.style.width = 91*deviceScale+"px";
+	}
+
 	sampleButton.id = id;
 	sampleButton.style.position = "fixed";
 	sampleButton.style.display = "block";
-	sampleButton.style.fontSize = 26*deviceScale+"px";
 	sampleButton.style.color = color;
-	sampleButton.style.height = 60*deviceScale+"px";
-	sampleButton.style.width = 140*deviceScale+"px";
 	sampleButton.textContent = text;
 	sampleButton.style.top = y*deviceScale+"px";
 	sampleButton.style.left = x*deviceScale+"px";
@@ -111,54 +120,56 @@ function displayButton(id, text, x, y, color){
 
 }
 
-function showImage(imgId, imgScale, x, y) {
+function showImage(imgId, imgScale, x, y, zIndex) {
 
 	var image = document.getElementById(imgId);
-
-	console.log(image.width);
-
 	image.style.width = image.width*deviceScale*imgScale+"px";
 	image.style.height = image.height*deviceScale*imgScale+"px";
 	image.style.top = y*deviceScale+"px";
 	image.style.left = x*deviceScale+"px";
+	image.style.zIndex = zIndex;
 
 	image.style.display = "inline";
 
 }
 
-
+/*
 function showRepeating(imgId, height, width, x, y){
 
 	var image = document.getElementById(imgId);
 
 }
+*/
 
 var cropArr = ["corn", "banana", "cacao", "beans", "cotton", "hemp", "sugarcane", "coffee"];
+var cropArrToSpanish = ["Maíces", "Platanos", "Cacaos", "Frijoles", "Algodones", "Cáñamos", "Caña de azúcar", "Café"];
 var cityCrops = [
-	{ name: "Flores", cropbool: [false, false, false, false, false, false, false, false]},
-	{ name: "Tikal", cropbool: [false, false, false, false, false, false, false, false]},
-	{ name: "Huehuetenango", cropbool: [false, false, false, false, false, false, false, false]},
-	{ name: "Cobán", cropbool: [true, false, true, false, false, false, false, false]},
-	{ name: "San Pedro Carchá", cropbool: [false, false, false, false, false, false, false, false]},
-	{ name: "La Ciudad de Guatemala", cropbool: [false, false, false, false, false, false, false, false]},
-	{ name: "Mazatenango", cropbool: [false, false, false, false, false, false, false, false]},
-	{ name: "San José", cropbool: [false, false, false, false, false, false, false, false]},
-	{ name: "Livingston", cropbool: [false, false, false, false, false, false, false, false]}
+	{ name: "Flores", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
+	{ name: "Tikal", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
+	{ name: "Huehuetenango", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
+	{ name: "Cobán", cropbool: [true, false, false, false, false, false, false, false], harvesters: [11, 0, 0, 0, 0, 0, 0, 0]},
+	{ name: "San Pedro Carchá", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
+	{ name: "La Ciudad de Guatemala", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
+	{ name: "Mazatenango", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
+	{ name: "San José", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
+	{ name: "Livingston", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]}
 ]
 
 
 
 
 var
-money = 0,
-corn = 1,
-bananas = 1,
-cacao = 1,
-beans = 1,
-cotton = 1,
-hemp = 1,
-sugarcane = 1,
-coffee = 1,
+money = 10000;
+cropVals = [
+	corn = 1,
+	bananas = 1,
+	cacao = 1,
+	beans = 1,
+	cotton = 1,
+	hemp = 1,
+	sugarcane = 1,
+	coffee = 1,
+]
 
 currentcityId = "Cobán",
 
@@ -166,29 +177,94 @@ running = true,
 isMale = true,
 tickcount = 0;
 
-function tick(){
-	
+function tick(){	
 	tickcount++;
+	displayInventory();
+}
 
-	if (tickcount % 20 == 0){
-		console.log(tickcount);
+function initInventory(){
+
+	displayText("moneyvalue", "Quetzales: " + money.toFixed(2), 30, 1030, 15, false, "green");
+	for (var i = 0; i < cropArr.length; i++){
+		displayText(cropArr[i] + "value", cropArrToSpanish[i] + ": " + cropVals[i], 30, 1030, 50+35*i, false, "green");
+		if (cropVals[i] < 1) document.getElementById(cropArr[i] + "value").display = "none";
 	}
 
 }
 
 function displayInventory(){
+	document.getElementById("moneyvalue").innerHTML =  "Quetzales: " + money.toFixed(2);
+	for (var i = 0; i < cropArr.length; i++){
+		document.getElementById(cropArr[i] + "value").innerHTML = cropArrToSpanish[i] + ": " + cropVals[i];
+	}
+}
 
-	var invStr = "Quetzales: " + money.toFixed(2) + "<br />";
-	if (corn > 0) invStr += "Maíces: " + corn + "<br />";
-	if (bananas > 0) invStr += "Platanos: " + bananas + "<br />";
-	if (cacao > 0) invStr += "Cacaos: " + cacao + "<br />";
-	if (beans > 0) invStr += "Frijoles: " + beans + "<br />";
-	if (cotton > 0) invStr += "Algodones: " + cotton + "<br />";
-	if (hemp > 0) invStr += "Cáñamos: " + hemp + "<br />";
-	if (sugarcane > 0) invStr += "Caña de azúcar: " + sugarcane + "<br />";
-	if (coffee > 0) invStr += "Café: " + coffee + "<br />";
+function getCityIndex(cityname){
+	for (var i = 0; i < cityCrops.length; i++){
+		if (cityname === cityCrops[i].name)
+			return i;
+	}
+	console.log("error");
+	return -1;
+}
 
-	displayText("invText", invStr, 35, 1030, 50, false, "green");
+function purchaseHarvester(cityIndex, cropIndex){
+
+	console.log("worked " + cityIndex + " " + cropIndex);
+
+	var
+	harvesters = cityCrops[cityIndex].harvesters[cropIndex],
+	harvesterPrice = Math.round((0.5 + Math.pow(1.3, harvesters))*100)/100;
+
+	if (money >= harvesterPrice){
+
+		money -= harvesterPrice;
+		cityCrops[cityIndex].harvesters[cropIndex]++;
+		harvesterPrice = Math.round((0.5 + Math.pow(1.3, harvesters+1))*100)/100;
+
+		document.getElementById(cropArr[cropIndex]+"harvesters").innerHTML = ("Cosechadores: " + (harvesters+1) + "<br />" + harvesterPrice + " Quetzales");
+		displayInventory();
+	}
+
+}
+
+function displayCropImages(){
+
+	var
+	cityIndex = getCityIndex(currentcityId),
+
+	currNumCrop = 0,
+	xOffset = 0,
+	yOffset = 0;
+
+	for (var i = 0; i < cityCrops[cityIndex].cropbool.length; i++){
+		if (cityCrops[cityIndex].cropbool[i]){
+			var tempY = 0;
+
+			var tempImg = document.getElementById(cropArr[i])
+
+			var ratio = 150/tempImg.height;
+
+			if (ratio*tempImg.width > 140){
+				tempScale = 140 / tempImg.width;
+				tempY = 100-(tempScale*tempImg.height);
+			}
+			else {
+				tempScale = ratio;
+			}
+
+			showImage(cropArr[i], tempScale, 15+xOffset, 20 + tempY + currNumCrop*150+yOffset, 1);
+			displayButton(cropArr[i]+"buybutton", "Comprar", 180+xOffset, 80 + currNumCrop*150+yOffset, false);
+			var tempHarvesters = cityCrops[cityIndex].harvesters[i];
+			var tempHarvesterPrice = Math.round((0.5 + Math.pow(1.2, tempHarvesters))*100)/100;
+			displayText(cropArr[i]+"harvesters", "Cosechadores: " + tempHarvesters + "<br />" + tempHarvesterPrice + " Quetzales", 20, 170+xOffset, 20 + currNumCrop*150+yOffset, true, "red");
+			(function(i) {
+				document.getElementById(cropArr[i]+"buybutton").onclick = function() { purchaseHarvester(cityIndex, i); };
+			})(i);
+			currNumCrop++;
+			if (currNumCrop > 3) {xOffset = 450; yOffset = -600;}
+		}
+	}
 
 }
 
@@ -196,10 +272,14 @@ function youAreIn(cityId){
 
 	var cityImg = document.getElementById(cityId);
 	var imgStretch = 1000/cityImg.width;
+	
 
-	showImage(cityId, imgStretch, 0, 0);
+
+
+	showImage(cityId, imgStretch, 0, 0, 0);
 	displayText("citytext", "Estás en la ciudad de " + currentcityId + ".", 60, 90, 575, false, "white");
 	displayInventory();
+	displayCropImages();
 
 
 }
@@ -225,12 +305,13 @@ function startgame(male){
 
 	disableDOMs(["starttext", "malebutton", "femalebutton", "introtext", "farmercat"]);
 
-	showImage("cities/guatemalatemple", 0.5, 0, 0);
+	showImage("cities/guatemalatemple", 0.5, 0, 0, 0);
 	displayText("welcometext", "Bienvenido a Guatemala!", 70, 100, 550, true, "white");
-	displayButton("continuetogamebutton", "Continuar", 650, 75, "black");
+	displayButton("continuetogamebutton", "Continuar", 650, 75, "black", true);
 
 	document.getElementById("continuetogamebutton").onclick = function() { 
 		disableDOMs(["cities/guatemalatemple", "welcometext", "continuetogamebutton"]);
+		initInventory();
 		run();
 	};
 }
@@ -238,14 +319,14 @@ function startgame(male){
 
 function begingame(){
 
-	showImage("farmercat", 1.5, 0, 160);
+	showImage("farmercat", 1.5, 0, 160, 0);
 
 	displayText("introtext", "Bienvenido!", 150, 100, 0, true, "blue");
 	displayText("starttext",
 				"Macho&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hembra",
 				60, 30, 200, true, "red");
-	displayButton("malebutton", "Jugar", 70, 280, "black");
-	displayButton("femalebutton", "Jugar", 860, 280, "black");
+	displayButton("malebutton", "Jugar", 70, 280, "black", true);
+	displayButton("femalebutton", "Jugar", 860, 280, "black", true);
 
 	document.getElementById("malebutton").onclick = function() {startgame(true);};
 	document.getElementById("femalebutton").onclick = function() {startgame(false);};

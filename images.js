@@ -12,8 +12,8 @@ var images = [
 	{name: "sugarcane", extension: "png", width: 552, height: 598},
 	{name: "cloud", extension: "png", width: 600, height: 326},
 	{name: "farmercat", extension: "gif", width: 720, height: 404},
-	{name: "cities/coban", extension: "jpg", width: 640, height: 480},
-	{name: "cities/sanpedrocarcha", extension: "jpg", width: 500, height: 375},
+	{name: "cities/Cobán", extension: "jpg", width: 640, height: 480},
+	{name: "cities/San Pedro Carchá", extension: "jpg", width: 500, height: 375},
 	{name: "cities/guatemalatemple", extension: "jpg", width: 2477, height: 1393}
 ];
 
@@ -77,89 +77,6 @@ function disableDOMs(domarr){
 		temp.style.display = "none";
 	}
 }
-
-function showImage(imgId, imgScale, x, y) {
-
-	var image = document.getElementById(imgId);
-
-	console.log(image.width);
-
-	image.style.width = image.width*deviceScale*imgScale+"px";
-	image.style.height = image.height*deviceScale*imgScale+"px";
-	image.style.top = y*deviceScale+"px";
-	image.style.left = x*deviceScale+"px";
-
-	image.style.display = "inline";
-
-}
-
-
-function showRepeating(imgId, height, width, x, y){
-
-	var image = document.getElementById(imgId);
-
-}
-
-
-
-
-var
-corn = 0,
-bananas = 0,
-cacao = 0,
-beans = 0,
-cotton = 0,
-hemp = 0,
-sugarcane = 0,
-coffee = 0,
-currentcityId = "Cobán";
-
-isMale = true,
-tickcount = 0;
-
-function tick(){
-	
-	tickcount++;
-
-	if (tickcount % 20 == 0){
-		console.log(tickcount);
-	}
-
-}
-
-
-
-	/* Display guatemala + nodes
-	showImage("guatemala", 1, 0, 0);
-	for (var i = 0; i < circles.length; i++){
-		var town = document.getElementById(circles[i].id);
-		town.style.display = "inline";
-	}
-	*/
-
-function run(){
-
-	setInterval(function() { tick(); }, 50);
-
-	console.log(test)
-}
-
-function startgame(male){
-
-	isMale = male;
-
-	disableDOMs(["starttext", "malebutton", "femalebutton", "introtext", "farmercat"]);
-
-	showImage("cities/guatemalatemple", 0.5, 0, 0);
-	displayText("welcometext", "Bienvenido a Guatemala!", 70, 100, 550, true, "white");
-	displayButton("continuetogamebutton", "Continuar", 650, 75, "black");
-
-	document.getElementById("continuetogamebutton").onclick = function() { 
-		disableDOMs(["cities/guatemalatemple", "welcometext", "continuetogamebutton"]);
-		run();
-	};
-}
-
 function displayText(id, text, size, x, y, isBold, color){
 	var sampleText = document.createElement("DIV");
 	sampleText.style.color = color;
@@ -193,6 +110,131 @@ function displayButton(id, text, x, y, color){
 	document.body.appendChild(sampleButton);
 
 }
+
+function showImage(imgId, imgScale, x, y) {
+
+	var image = document.getElementById(imgId);
+
+	console.log(image.width);
+
+	image.style.width = image.width*deviceScale*imgScale+"px";
+	image.style.height = image.height*deviceScale*imgScale+"px";
+	image.style.top = y*deviceScale+"px";
+	image.style.left = x*deviceScale+"px";
+
+	image.style.display = "inline";
+
+}
+
+
+function showRepeating(imgId, height, width, x, y){
+
+	var image = document.getElementById(imgId);
+
+}
+
+var cropArr = ["corn", "banana", "cacao", "beans", "cotton", "hemp", "sugarcane", "coffee"];
+var cityCrops = [
+	{ name: "Flores", cropbool: [false, false, false, false, false, false, false, false]},
+	{ name: "Tikal", cropbool: [false, false, false, false, false, false, false, false]},
+	{ name: "Huehuetenango", cropbool: [false, false, false, false, false, false, false, false]},
+	{ name: "Cobán", cropbool: [true, false, true, false, false, false, false, false]},
+	{ name: "San Pedro Carchá", cropbool: [false, false, false, false, false, false, false, false]},
+	{ name: "La Ciudad de Guatemala", cropbool: [false, false, false, false, false, false, false, false]},
+	{ name: "Mazatenango", cropbool: [false, false, false, false, false, false, false, false]},
+	{ name: "San José", cropbool: [false, false, false, false, false, false, false, false]},
+	{ name: "Livingston", cropbool: [false, false, false, false, false, false, false, false]}
+]
+
+
+
+
+var
+money = 0,
+corn = 1,
+bananas = 1,
+cacao = 1,
+beans = 1,
+cotton = 1,
+hemp = 1,
+sugarcane = 1,
+coffee = 1,
+
+currentcityId = "Cobán",
+
+running = true,
+isMale = true,
+tickcount = 0;
+
+function tick(){
+	
+	tickcount++;
+
+	if (tickcount % 20 == 0){
+		console.log(tickcount);
+	}
+
+}
+
+function displayInventory(){
+
+	var invStr = "Quetzales: " + money.toFixed(2) + "<br />";
+	if (corn > 0) invStr += "Maíces: " + corn + "<br />";
+	if (bananas > 0) invStr += "Platanos: " + bananas + "<br />";
+	if (cacao > 0) invStr += "Cacaos: " + cacao + "<br />";
+	if (beans > 0) invStr += "Frijoles: " + beans + "<br />";
+	if (cotton > 0) invStr += "Algodones: " + cotton + "<br />";
+	if (hemp > 0) invStr += "Cáñamos: " + hemp + "<br />";
+	if (sugarcane > 0) invStr += "Caña de azúcar: " + sugarcane + "<br />";
+	if (coffee > 0) invStr += "Café: " + coffee + "<br />";
+
+	displayText("invText", invStr, 35, 1030, 50, false, "green");
+
+}
+
+function youAreIn(cityId){
+
+	var cityImg = document.getElementById(cityId);
+	var imgStretch = 1000/cityImg.width;
+
+	showImage(cityId, imgStretch, 0, 0);
+	displayText("citytext", "Estás en la ciudad de " + currentcityId + ".", 60, 90, 575, false, "white");
+	displayInventory();
+
+
+}
+
+	/* Display guatemala + nodes
+	showImage("guatemala", 1, 0, 0);
+	for (var i = 0; i < circles.length; i++){
+		var town = document.getElementById(circles[i].id);
+		town.style.display = "inline";
+	}
+	*/
+
+function run(){
+	setInterval(function() { tick(); }, 50);
+
+	youAreIn("cities/"+currentcityId)
+
+}
+
+function startgame(male){
+
+	isMale = male;
+
+	disableDOMs(["starttext", "malebutton", "femalebutton", "introtext", "farmercat"]);
+
+	showImage("cities/guatemalatemple", 0.5, 0, 0);
+	displayText("welcometext", "Bienvenido a Guatemala!", 70, 100, 550, true, "white");
+	displayButton("continuetogamebutton", "Continuar", 650, 75, "black");
+
+	document.getElementById("continuetogamebutton").onclick = function() { 
+		disableDOMs(["cities/guatemalatemple", "welcometext", "continuetogamebutton"]);
+		run();
+	};
+}
+
 
 function begingame(){
 

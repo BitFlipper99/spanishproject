@@ -23,7 +23,6 @@ displayedGraphics = [];
 var deviceScale = 1;
 
 /* Initialize images */
-
 for (var i = 0; i < images.length; i++) {
 	var new_image = document.createElement("IMG");
 	new_image.src = "res/images/" + images[i].name + "." + images[i].extension;
@@ -67,6 +66,8 @@ for (var i = 0; i < circles.length; i++) {
 	new_circle.style.top = circles[i].y*deviceScale + "px";
 	new_circle.style.left = circles[i].x*deviceScale + "px";
 	new_circle.id = circles[i].id;
+	new_circle.x = circles[i].x;
+	new_circle.y = circles[i].y;
 	new_circle.style.backgroundColor = circles[i].color;
 	new_circle.style.borderRadius = "50%";
 	new_circle.style.display = "none";
@@ -83,7 +84,10 @@ function disableDOMs(){
 function displayText(id, text, size, x, y, isBold, color, backgroundColor){
 
 	if (document.getElementById(id)){
-		document.getElementById(id).style.display = "inline";
+		var sampleText = document.getElementById(id);
+		sampleText.style.display = "inline";
+		sampleText.style.left = x*deviceScale+"px";
+		sampleText.style.top = y*deviceScale+"px";
 	}
 	else{
 		var sampleText = document.createElement("DIV");
@@ -107,7 +111,10 @@ function displayText(id, text, size, x, y, isBold, color, backgroundColor){
 function displayButton(id, text, x, y, color, big){
 
 	if (document.getElementById(id)){
-		document.getElementById(id).style.display = "inline";
+		var sampleButton = document.getElementById(id);
+		sampleButton.style.display = "inline";
+		sampleButton.style.left = x*deviceScale+"px";
+		sampleButton.style.top = y*deviceScale+"px";
 	}
 	else{
 		var sampleButton = document.createElement("BUTTON");
@@ -160,6 +167,7 @@ function showRepeating(imgId, height, width, x, y){
 */
 
 var cropArr = ["corn", "banana", "cacao", "beans", "cotton", "hemp", "sugarcane", "coffee"];
+var cropArrPrices = [0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2];
 var cropArrToSpanish = ["Maíces", "Platanos", "Cacaos", "Frijoles", "Algodones", "Cáñamos", "Caña de azúcar", "Café"];
 var cityCrops = [
 	{ name: "Flores", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
@@ -177,16 +185,16 @@ var cityCrops = [
 
 
 var
-money = 1000000000000000000;
+money = 3;
 cropVals = [
-	corn = 1,
-	bananas = 1,
-	cacao = 1,
-	beans = 1,
-	cotton = 1,
-	hemp = 1,
-	sugarcane = 1,
-	coffee = 1,
+	corn = 0,
+	bananas = 0,
+	cacao = 0,
+	beans = 0,
+	cotton = 0,
+	hemp = 0,
+	sugarcane = 0,
+	coffee = 0,
 ],
 
 currentcityId = "Cobán",
@@ -214,6 +222,16 @@ function tick(){
 		}
 	}
 
+	for (var i = 0; i < cityCrops[0].cropbool.length; i++){
+		for (var j = 0; j < cropVals.length; j++){
+			if (cityCrops[j].cropbool[i]){
+
+				cropArrPrices[i] += 0.000005;
+				break;
+			}
+		}
+	}
+
 }
 
 function initInventory(){
@@ -221,7 +239,7 @@ function initInventory(){
 	displayText("moneyvalue", "Quetzales: " + money.toFixed(2), 30, 1030, 15, false, "green", "black");
 	for (var i = 0; i < cropArr.length; i++){
 		displayText(cropArr[i] + "value", cropArrToSpanish[i] + ": " + Math.floor(cropVals[i]), 30, 1030, 50+35*i, false, "green", "black");
-		if (cropVals[i] < 1) document.getElementById(cropArr[i] + "value").display = "none";
+		if (cropVals[i] < 1) document.getElementById(cropArr[i] + "value").style.display = "none";
 	}
 
 }
@@ -231,7 +249,11 @@ function displayInventory(){
 	for (var i = 0; i < cropArr.length; i++){
 		var tempelem = document.getElementById(cropArr[i] + "value");
 		tempelem.innerHTML = cropArrToSpanish[i] + ": " + cropVals[i];
-		tempelem.display = "inline";
+		if(cropVals[i] < 1){
+			tempelem.style.display = "none";
+		} else{
+			tempelem.style.display = "inline";
+		}
 	}
 }
 
@@ -250,13 +272,13 @@ function purchaseHarvester(cityIndex, cropIndex){
 
 	var
 	harvesters = cityCrops[cityIndex].harvesters[cropIndex],
-	harvesterPrice = Math.round((0.5 + Math.pow(1.3, harvesters))*100)/100;
+	harvesterPrice = Math.round((0.5 + Math.pow(1.3, harvesters) + 2*harvesters)*100)/100;
 
 	if (money >= harvesterPrice){
 
 		money -= harvesterPrice;
 		cityCrops[cityIndex].harvesters[cropIndex]++;
-		harvesterPrice = Math.round((0.5 + Math.pow(1.3, harvesters+1))*100)/100;
+		harvesterPrice = Math.round((0.5 + Math.pow(1.3, harvesters+1) + 2*(harvesters+1))*100)/100;
 
 		document.getElementById(cropArr[cropIndex]+"harvesters").innerHTML = ("Cosechadores: " + (harvesters+1) + "<br />" + harvesterPrice + " Quetzales");
 		displayInventory();
@@ -264,8 +286,78 @@ function purchaseHarvester(cityIndex, cropIndex){
 
 }
 
-function displayCropImages(){
+function sellCrops(i){
+	money += cropVals[i]*(Math.round(cropArrPrices[i]*100)/100);
+	cropArrPrices[i] *= Math.pow(0.5, (cropVals[i] / 10000));
+	cropVals[i] = 0;
+	document.getElementById(cropArr[i]+"priceper").innerHTML = "Cada uno: " + Math.round(cropArrPrices[i]*100)/100;
+}
 
+function purchaseStall(i){
+
+	var stallCost = Math.round((cropArrPrices[i] * 1000)*100)/100;
+	var cityIndex = getCityIndex(currentcityId);
+
+	console.log(stallCost + " " + i);
+
+	if (money >= stallCost){
+		money-=stallCost;
+		cityCrops[cityIndex].cropbool[i] = true;
+		console.log("test");
+		walkToMarket();
+	}
+
+
+}
+
+function displayMarketOptions(){
+	var
+	cityIndex = getCityIndex(currentcityId),
+
+	currNumCrop = 0,
+	xOffset = 0,
+	yOffset = 0;
+
+	for (var i = 0; i < cityCrops[cityIndex].cropbool.length; i++){
+		if (cityCrops[cityIndex].cropbool[i]){
+			var tempY = 0;
+
+			var tempImg = document.getElementById(cropArr[i])
+
+			var ratio = 150/tempImg.height;
+
+			if (ratio*tempImg.width > 140){
+				tempScale = 140 / tempImg.width;
+				tempY = 100-(tempScale*tempImg.height);
+			}
+			else {
+				tempScale = ratio;
+			}
+
+			showImage(cropArr[i], tempScale, 15+xOffset, 20 + tempY + currNumCrop*150+yOffset, 1);
+			displayButton(cropArr[i]+"sellbutton", "Vender", 180+xOffset, 80 + currNumCrop*150+yOffset, false);
+			displayText(cropArr[i]+"priceper", "Cada uno: " + Math.round(cropArrPrices[i]*100)/100, 20, 170+xOffset, 20 + currNumCrop*150+yOffset, true, "white", "black");
+			(function(i) {
+				document.getElementById(cropArr[i]+"sellbutton").onclick = function() { sellCrops(i); };
+			})(i);
+			currNumCrop++;
+		}
+		else { 
+
+			displayText(cropArr[i]+"createplottext", "Costo de Constuir: " + Math.round((cropArrPrices[i] * 1000)*100)/100, 20, 160+xOffset, 20 + currNumCrop*150+yOffset, true, "white", "black")
+			displayButton(cropArr[i]+"createplot", "Construir", 180+xOffset, 80 + currNumCrop*150+yOffset, true);
+			currNumCrop++;
+			(function(i) {
+				document.getElementById(cropArr[i]+"createplot").onclick = function() { purchaseStall(i); };
+			})(i); 
+		}
+		if (currNumCrop > 3) {xOffset = 450; yOffset = -600;}
+	}
+
+}
+
+
+function displayCropImages(){
 	var
 	cityIndex = getCityIndex(currentcityId),
 
@@ -292,8 +384,8 @@ function displayCropImages(){
 			showImage(cropArr[i], tempScale, 15+xOffset, 20 + tempY + currNumCrop*150+yOffset, 1);
 			displayButton(cropArr[i]+"buybutton", "Comprar", 180+xOffset, 80 + currNumCrop*150+yOffset, false);
 			var tempHarvesters = cityCrops[cityIndex].harvesters[i];
-			var tempHarvesterPrice = Math.round((0.5 + Math.pow(1.2, tempHarvesters))*100)/100;
-			displayText(cropArr[i]+"harvesters", "Cosechadores: " + tempHarvesters + "<br />" + tempHarvesterPrice + " Quetzales", 20, 170+xOffset, 20 + currNumCrop*150+yOffset, true, "red");
+			var tempHarvesterPrice = Math.round((0.5 + Math.pow(1.2, tempHarvesters) + 2*tempHarvesters)*100)/100;
+			displayText(cropArr[i]+"harvesters", "Cosechadores: " + tempHarvesters + "<br />" + tempHarvesterPrice + " Quetzales", 20, 170+xOffset, 20 + currNumCrop*150+yOffset, true, "white", "black");
 			(function(i) {
 				document.getElementById(cropArr[i]+"buybutton").onclick = function() { purchaseHarvester(cityIndex, i); };
 			})(i);
@@ -310,6 +402,7 @@ function walkToMarket(){
 	showImage("cities/SpanishMarket", 2, 0, 0, 0);
 	displayButton("leavemarketbutton", "Salir", 1065, 550, true, "black");
 	displayText("markettext", "Estás en el mercado.", 60, 90, 575, false, "black");
+	displayMarketOptions();
 	document.getElementById("leavemarketbutton").onclick = function() { youAreIn("cities/" + currentcityId); };
 }
 

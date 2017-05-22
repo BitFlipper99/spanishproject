@@ -14,8 +14,11 @@ var images = [
 	{name: "farmercat", extension: "gif", width: 720, height: 404},
 	{name: "cities/Cobán", extension: "jpg", width: 640, height: 480},
 	{name: "cities/San Pedro Carchá", extension: "jpg", width: 500, height: 375},
-	{name: "cities/guatemalatemple", extension: "jpg", width: 2477, height: 1393}
+	{name: "cities/guatemalatemple", extension: "jpg", width: 2477, height: 1393},
+	{name: "cities/SpanishMarket", extension: "jpg", width: 630, height: 322}
 ];
+
+displayedGraphics = [];
 
 var deviceScale = 1;
 
@@ -71,52 +74,67 @@ for (var i = 0; i < circles.length; i++) {
 	document.body.appendChild(new_circle);
 }
 
-function disableDOMs(domarr){
-	for (var i = 0; i < domarr.length; i++){
-		var temp = document.getElementById(domarr[i]);
+function disableDOMs(){
+	for (var i = 0; i < displayedGraphics.length; i++){
+		var temp = document.getElementById(displayedGraphics[i]);
 		temp.style.display = "none";
 	}
 }
-function displayText(id, text, size, x, y, isBold, color){
-	var sampleText = document.createElement("DIV");
-	sampleText.style.color = color;
-	sampleText.style.fontSize = size*deviceScale+"px";
-	sampleText.innerHTML = text;
-	sampleText.id = id;
-	sampleText.style.position = "absolute";
-	if (isBold)
-		sampleText.style.fontWeight = "bold";
-	sampleText.style.left = x*deviceScale+"px";
-	sampleText.style.top = y*deviceScale+"px";
-	sampleText.style.zIndex = 10;
-	document.body.appendChild(sampleText);
+function displayText(id, text, size, x, y, isBold, color, backgroundColor){
+
+	if (document.getElementById(id)){
+		document.getElementById(id).style.display = "inline";
+	}
+	else{
+		var sampleText = document.createElement("DIV");
+		sampleText.style.color = color;
+		sampleText.style.fontSize = size*deviceScale+"px";
+		sampleText.innerHTML = text;
+		sampleText.id = id;
+		sampleText.style.position = "absolute";
+		if (isBold)
+			sampleText.style.fontWeight = "bold";
+		sampleText.style.left = x*deviceScale+"px";
+		sampleText.style.top = y*deviceScale+"px";
+		sampleText.style.zIndex = 10;
+		if (backgroundColor)
+			sampleText.style.backgroundColor = backgroundColor;
+		document.body.appendChild(sampleText);
+		displayedGraphics.push(id);
+	}	
 }
 
 function displayButton(id, text, x, y, color, big){
-	var sampleButton = document.createElement("BUTTON");
 
-	if (big){
-		sampleButton.style.fontSize = 26*deviceScale+"px";
-		sampleButton.style.height = 60*deviceScale+"px";
-		sampleButton.style.width = 140*deviceScale+"px";
+	if (document.getElementById(id)){
+		document.getElementById(id).style.display = "inline";
 	}
-	else {
-		sampleButton.style.fontSize = 16.9*deviceScale+"px";
-		sampleButton.style.height = 39*deviceScale+"px";
-		sampleButton.style.width = 91*deviceScale+"px";
-	}
+	else{
+		var sampleButton = document.createElement("BUTTON");
 
-	sampleButton.id = id;
-	sampleButton.style.position = "fixed";
-	sampleButton.style.display = "block";
-	sampleButton.style.color = color;
-	sampleButton.textContent = text;
-	sampleButton.style.top = y*deviceScale+"px";
-	sampleButton.style.left = x*deviceScale+"px";
-	sampleButton.style.color = color;
-	sampleButton.style.zIndex = 1000;
+		if (big){
+			sampleButton.style.fontSize = 26*deviceScale+"px";
+			sampleButton.style.height = 60*deviceScale+"px";
+			sampleButton.style.width = 140*deviceScale+"px";
+		}
+		else {
+			sampleButton.style.fontSize = 16.9*deviceScale+"px";
+			sampleButton.style.height = 39*deviceScale+"px";
+			sampleButton.style.width = 91*deviceScale+"px";
+		}
 
-	document.body.appendChild(sampleButton);
+		sampleButton.id = id;
+		sampleButton.style.position = "fixed";
+		sampleButton.style.display = "block";
+		sampleButton.style.color = color;
+		sampleButton.textContent = text;
+		sampleButton.style.top = y*deviceScale+"px";
+		sampleButton.style.left = x*deviceScale+"px";
+		sampleButton.style.color = color;
+		sampleButton.style.zIndex = 1000;
+		displayedGraphics.push(id);
+		document.body.appendChild(sampleButton);
+}	
 
 }
 
@@ -128,7 +146,7 @@ function showImage(imgId, imgScale, x, y, zIndex) {
 	image.style.top = y*deviceScale+"px";
 	image.style.left = x*deviceScale+"px";
 	image.style.zIndex = zIndex;
-
+	displayedGraphics.push(imgId);
 	image.style.display = "inline";
 
 }
@@ -147,7 +165,7 @@ var cityCrops = [
 	{ name: "Flores", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
 	{ name: "Tikal", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
 	{ name: "Huehuetenango", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
-	{ name: "Cobán", cropbool: [true, false, false, false, false, false, false, false], harvesters: [11, 0, 0, 0, 0, 0, 0, 0]},
+	{ name: "Cobán", cropbool: [true, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
 	{ name: "San Pedro Carchá", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
 	{ name: "La Ciudad de Guatemala", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
 	{ name: "Mazatenango", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
@@ -159,7 +177,7 @@ var cityCrops = [
 
 
 var
-money = 10000;
+money = 1000000000000000000;
 cropVals = [
 	corn = 1,
 	bananas = 1,
@@ -169,24 +187,40 @@ cropVals = [
 	hemp = 1,
 	sugarcane = 1,
 	coffee = 1,
-]
+],
 
 currentcityId = "Cobán",
 
+hasMap = true,
 running = true,
 isMale = true,
-tickcount = 0;
+tickCount = 0;
 
 function tick(){	
-	tickcount++;
+	tickCount++;
 	displayInventory();
+	for (var i = 0; i < cropVals.length; i++){
+		var sumHarvesters = 0;
+		for (var j = 0; j < cityCrops.length; j++){
+			sumHarvesters += cityCrops[j].harvesters[i];
+		}
+		if (sumHarvesters == 0 ){
+			continue;
+		}
+		var tempRate = Math.ceil(1 / (sumHarvesters / 150));
+		var extra = (sumHarvesters > 150) ? (1 - (sumHarvesters / 150)) : 0;
+		if (tickCount % tempRate == 0){ 
+			cropVals[i]+= (1 + extra);
+		}
+	}
+
 }
 
 function initInventory(){
 
-	displayText("moneyvalue", "Quetzales: " + money.toFixed(2), 30, 1030, 15, false, "green");
+	displayText("moneyvalue", "Quetzales: " + money.toFixed(2), 30, 1030, 15, false, "green", "black");
 	for (var i = 0; i < cropArr.length; i++){
-		displayText(cropArr[i] + "value", cropArrToSpanish[i] + ": " + cropVals[i], 30, 1030, 50+35*i, false, "green");
+		displayText(cropArr[i] + "value", cropArrToSpanish[i] + ": " + Math.floor(cropVals[i]), 30, 1030, 50+35*i, false, "green", "black");
 		if (cropVals[i] < 1) document.getElementById(cropArr[i] + "value").display = "none";
 	}
 
@@ -195,7 +229,9 @@ function initInventory(){
 function displayInventory(){
 	document.getElementById("moneyvalue").innerHTML =  "Quetzales: " + money.toFixed(2);
 	for (var i = 0; i < cropArr.length; i++){
-		document.getElementById(cropArr[i] + "value").innerHTML = cropArrToSpanish[i] + ": " + cropVals[i];
+		var tempelem = document.getElementById(cropArr[i] + "value");
+		tempelem.innerHTML = cropArrToSpanish[i] + ": " + cropVals[i];
+		tempelem.display = "inline";
 	}
 }
 
@@ -268,18 +304,41 @@ function displayCropImages(){
 
 }
 
+function walkToMarket(){
+	disableDOMs();
+	initInventory();
+	showImage("cities/SpanishMarket", 2, 0, 0, 0);
+	displayButton("leavemarketbutton", "Salir", 1065, 550, true, "black");
+	displayText("markettext", "Estás en el mercado.", 60, 90, 575, false, "black");
+	document.getElementById("leavemarketbutton").onclick = function() { youAreIn("cities/" + currentcityId); };
+}
+
+function initBasicButtons(){
+
+	displayText("market", "Al mercado", 30, 1050, 500, true, "black");
+	displayButton("marketbutton", "Caminar", 1065, 550, true, "black");
+	document.getElementById("marketbutton").onclick = function() { 
+		walkToMarket();
+	};
+
+}
+
 function youAreIn(cityId){
+
+	disableDOMs();
 
 	var cityImg = document.getElementById(cityId);
 	var imgStretch = 1000/cityImg.width;
 	
-
-
-
 	showImage(cityId, imgStretch, 0, 0, 0);
 	displayText("citytext", "Estás en la ciudad de " + currentcityId + ".", 60, 90, 575, false, "white");
-	displayInventory();
 	displayCropImages();
+	initInventory();
+	initBasicButtons();
+
+	if(hasMap){
+
+	}
 
 
 }
@@ -303,7 +362,7 @@ function startgame(male){
 
 	isMale = male;
 
-	disableDOMs(["starttext", "malebutton", "femalebutton", "introtext", "farmercat"]);
+	disableDOMs();
 
 	showImage("cities/guatemalatemple", 0.5, 0, 0, 0);
 	displayText("welcometext", "Bienvenido a Guatemala!", 70, 100, 550, true, "white");
@@ -311,7 +370,6 @@ function startgame(male){
 
 	document.getElementById("continuetogamebutton").onclick = function() { 
 		disableDOMs(["cities/guatemalatemple", "welcometext", "continuetogamebutton"]);
-		initInventory();
 		run();
 	};
 }

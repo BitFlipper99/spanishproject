@@ -11,11 +11,15 @@ var images = [
 	{name: "male_farmer", extension: "png", width: 340, height: 500},
 	{name: "sugarcane", extension: "png", width: 552, height: 598},
 	{name: "cloud", extension: "png", width: 600, height: 326},
+
 	{name: "farmercat", extension: "gif", width: 720, height: 404},
+
 	{name: "cities/Cobán", extension: "jpg", width: 640, height: 480},
 	{name: "cities/San Pedro Carchá", extension: "jpg", width: 500, height: 375},
 	{name: "cities/guatemalatemple", extension: "jpg", width: 2477, height: 1393},
-	{name: "cities/SpanishMarket", extension: "jpg", width: 630, height: 322}
+	{name: "cities/SpanishMarket", extension: "jpg", width: 630, height: 322},
+	{name: "cities/undergroundmarket", extension: "jpg", width: 800, height: 450},
+	{name: "cities/shadymerchant", extension: "jpg", width: 777, height: 666}
 ];
 
 displayedGraphics = [];
@@ -81,32 +85,6 @@ function disableDOMs(){
 		temp.style.display = "none";
 	}
 }
-function displayText(id, text, size, x, y, isBold, color, backgroundColor){
-
-	if (document.getElementById(id)){
-		var sampleText = document.getElementById(id);
-		sampleText.style.display = "inline";
-		sampleText.style.left = x*deviceScale+"px";
-		sampleText.style.top = y*deviceScale+"px";
-	}
-	else{
-		var sampleText = document.createElement("DIV");
-		sampleText.style.color = color;
-		sampleText.style.fontSize = size*deviceScale+"px";
-		sampleText.innerHTML = text;
-		sampleText.id = id;
-		sampleText.style.position = "absolute";
-		if (isBold)
-			sampleText.style.fontWeight = "bold";
-		sampleText.style.left = x*deviceScale+"px";
-		sampleText.style.top = y*deviceScale+"px";
-		sampleText.style.zIndex = 10;
-		if (backgroundColor)
-			sampleText.style.backgroundColor = backgroundColor;
-		document.body.appendChild(sampleText);
-		displayedGraphics.push(id);
-	}	
-}
 
 function displayButton(id, text, x, y, color, big){
 
@@ -145,18 +123,9 @@ function displayButton(id, text, x, y, color, big){
 
 }
 
-function showImage(imgId, imgScale, x, y, zIndex) {
 
-	var image = document.getElementById(imgId);
-	image.style.width = image.width*deviceScale*imgScale+"px";
-	image.style.height = image.height*deviceScale*imgScale+"px";
-	image.style.top = y*deviceScale+"px";
-	image.style.left = x*deviceScale+"px";
-	image.style.zIndex = zIndex;
-	displayedGraphics.push(imgId);
-	image.style.display = "inline";
 
-}
+
 
 /*
 function showRepeating(imgId, height, width, x, y){
@@ -185,7 +154,7 @@ var cityCrops = [
 
 
 var
-money = 3;
+money = 100;
 cropVals = [
 	corn = 0,
 	bananas = 0,
@@ -197,12 +166,17 @@ cropVals = [
 	coffee = 0,
 ],
 
+animatingDOMs = [],
+
 currentcityId = "Cobán",
 
+cutsceneboolarr = [true, true, true],
 hasMap = true,
 running = true,
 isMale = true,
 tickCount = 0;
+
+
 
 function tick(){	
 	tickCount++;
@@ -231,6 +205,110 @@ function tick(){
 			}
 		}
 	}
+
+	for (var i = 0; i < animatingDOMs.length; i++){
+		if (animatingDOMs[i].anim == "fade"){
+			var rate = 50 / animatingDOMs[i].time;
+			var currOp = animatingDOMs[i].currOp;
+			console.log(currOp);
+			if (animatingDOMs[i].fadeIn){
+				currOp += rate;
+				document.getElementById(animatingDOMs[i].id).style.opacity = currOp;
+				animatingDOMs[i].currOp = currOp;
+
+				if (currOp >= 1) {
+					animatingDOMs.splice(i, 1);
+				}
+			}
+			else {
+				document.getElementById(animatingDOMs[i].id).style.opacity = currOp - rate;
+				currOp -= rate;
+
+				if (currOp <= 0) {
+					animatingDOMs.splice(i, 1);
+				}
+			}
+
+		}
+		else if (animatingDOMs[i].anim == "type"){
+			if (tickCount % 2 == 0){
+
+				console.log("hello");
+				animatingDOMs[i].currstr += animatingDOMs[i].text.charAt(animatingDOMs[i].currind);
+				animatingDOMs[i].currind++;
+
+				document.getElementById(animatingDOMs[i].id).innerHTML = animatingDOMs[i].currstr;
+
+				if (animatingDOMs[i].currind >= animatingDOMs[i].text.length-1){
+					animatingDOMs.splice(i, 1);
+				}
+			}
+		}
+
+	}
+
+}
+
+function displayText(id, text, size, x, y, isBold, color, backgroundColor, typed){
+
+	if (document.getElementById(id)){
+		var sampleText = document.getElementById(id);
+		sampleText.style.display = "inline";
+		sampleText.style.left = x*deviceScale+"px";
+		sampleText.style.top = y*deviceScale+"px";
+	}
+	else{
+		var sampleText = document.createElement("DIV");
+		sampleText.style.color = color;
+		sampleText.style.fontSize = size*deviceScale+"px";
+		sampleText.innerHTML = text;
+		sampleText.id = id;
+		sampleText.style.position = "absolute";
+		if (isBold)
+			sampleText.style.fontWeight = "bold";
+		sampleText.style.left = x*deviceScale+"px";
+		sampleText.style.top = y*deviceScale+"px";
+		sampleText.style.zIndex = 10;
+		if (backgroundColor)
+			sampleText.style.backgroundColor = backgroundColor;
+		document.body.appendChild(sampleText);
+		displayedGraphics.push(id);
+	}	
+
+	if (typed){
+		console.log("this woroked");
+		sampleText.innerHTML = "";
+		animatingDOMs.push({anim: "type", id: id, text: text, currstr: "", currind: 0});
+	}
+
+}
+
+function showImage(imgId, imgScale, x, y, zIndex, time, fadeIn) {
+
+	var image = document.getElementById(imgId);
+	image.style.width = image.width*deviceScale*imgScale+"px";
+	image.style.height = image.height*deviceScale*imgScale+"px";
+	image.style.top = y*deviceScale+"px";
+	image.style.left = x*deviceScale+"px";
+	image.style.zIndex = zIndex;
+
+	displayedGraphics.push(imgId);
+	image.style.display = "inline";
+
+	if (time) {
+		var currAnnInd = animatingDOMs.length-1;
+		var opp = (fadeIn) ? 0 : 100;
+		console.log(opp);
+		image.style.opacity = opp;
+		animatingDOMs.push({anim: "fade", id: imgId, fadeIn: fadeIn, time: time, currOp: opp});
+	}
+}
+
+
+function cutscene(imgId, scale, zIndex, linetext){
+
+	showImage(imgId, scale, 0, 0, zIndex, 5000, true);
+
 
 }
 
@@ -396,12 +474,31 @@ function displayCropImages(){
 
 }
 
+function blackMarket(){
+	disableDOMs();
+	showImage("cities/undergroundmarket", 1.5, 0, 0, 0);
+	if (cutsceneboolarr[0]){
+		var lineText = ["Ay, ¿Quién crees que eres?", "No debes estar aquí si no es necesario.", "Adelántese entonces, pero ten cuiado..."];
+		cutscene("cities/shadymerchant", 1.2, 1, lineText);
+	}
+	
+	initInventory();
+	
+
+}
+
 function walkToMarket(){
 	disableDOMs();
 	initInventory();
 	showImage("cities/SpanishMarket", 2, 0, 0, 0);
 	displayButton("leavemarketbutton", "Salir", 1065, 550, true, "black");
-	displayText("markettext", "Estás en el mercado.", 60, 90, 575, false, "black");
+	displayText("markettext", "Estás en el mercado.", 60, 90, 575, false, "black", "transparent", true);
+	if (money > 10){
+		displayText("blackmarkettext", "Mercado Negro", 40, 1000, 430, true, "red", "black");
+		displayButton("blackmarketbutton", "Cuidate", 1065, 480, true, "black");
+		document.getElementById("blackmarketbutton").onclick = function() { blackMarket();};
+
+	}
 	displayMarketOptions();
 	document.getElementById("leavemarketbutton").onclick = function() { youAreIn("cities/" + currentcityId); };
 }
@@ -424,7 +521,7 @@ function youAreIn(cityId){
 	var imgStretch = 1000/cityImg.width;
 	
 	showImage(cityId, imgStretch, 0, 0, 0);
-	displayText("citytext", "Estás en la ciudad de " + currentcityId + ".", 60, 90, 575, false, "white");
+	displayText("citytext", "Estás en la ciudad de " + currentcityId + ".", 60, 90, 575, false, "white", "transparent", true);
 	displayCropImages();
 	initInventory();
 	initBasicButtons();

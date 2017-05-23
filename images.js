@@ -11,6 +11,10 @@ var images = [
 	{name: "male_farmer", extension: "png", width: 340, height: 500},
 	{name: "sugarcane", extension: "png", width: 552, height: 598},
 	{name: "cloud", extension: "png", width: 600, height: 326},
+	{name: "map", extension: "png", width: 640, height: 554},
+	{name: "car", extension: "png", width: 800, height: 410},
+
+	{name: "placeholder", extension: "png", width: 500, height: 500},
 
 	{name: "farmercat", extension: "gif", width: 720, height: 404},
 
@@ -143,7 +147,7 @@ var cityCrops = [
 	{ name: "Tikal", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
 	{ name: "Huehuetenango", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
 	{ name: "Cobán", cropbool: [true, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
-	{ name: "San Pedro Carchá", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
+	{ name: "San Pedro Carchá", cropbool: [false, true, true, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
 	{ name: "La Ciudad de Guatemala", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
 	{ name: "Mazatenango", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
 	{ name: "San José", cropbool: [false, false, false, false, false, false, false, false], harvesters: [0, 0, 0, 0, 0, 0, 0, 0]},
@@ -171,7 +175,12 @@ animatingDOMs = [],
 currentcityId = "Cobán",
 
 cutsceneboolarr = [true, true, true],
-hasMap = true,
+// map, car, ...
+BMInfo = [{purchased: false, price: 25, imgId: "map", spanishName: "Mapa"}, {purchased: false, price: 2000, imgId: "car", spanishName: "Coche"},
+		  {purchased: false, price: 100000, imgId: "placeholder", spanishName: "nada"}, {purchased: false, price: 100000, imgId: "placeholder", spanishName: "nada"},
+		  {purchased: false, price: 100000, imgId: "placeholder", spanishName: "nada"}, {purchased: false, price: 100000, imgId: "placeholder", spanishName: "nada"}];
+blackmarketpurchases = [false, false, false, false, false, false],
+blackmarketpurchaseprice = [10, 200, 10000, 10000, 10000, 10000],
 running = true,
 isMale = true,
 tickCount = 0;
@@ -220,8 +229,9 @@ function tick(){
 				}
 			}
 			else {
-				document.getElementById(animatingDOMs[i].id).style.opacity = currOp - rate;
 				currOp -= rate;
+				document.getElementById(animatingDOMs[i].id).style.opacity = currOp;
+				animatingDOMs[i].currOp = currOp;
 
 				if (currOp <= 0) {
 					animatingDOMs.splice(i, 1);
@@ -237,7 +247,7 @@ function tick(){
 
 				document.getElementById(animatingDOMs[i].id).innerHTML = animatingDOMs[i].currstr;
 
-				if (animatingDOMs[i].currind >= animatingDOMs[i].text.length-1){
+				if (animatingDOMs[i].currind >= animatingDOMs[i].text.length){
 					animatingDOMs.splice(i, 1);
 				}
 			}
@@ -294,7 +304,7 @@ function showImage(imgId, imgScale, x, y, zIndex, time, fadeIn) {
 
 	if (time) {
 		var currAnnInd = animatingDOMs.length-1;
-		var opp = (fadeIn) ? 0 : 100;
+		var opp = (fadeIn) ? 0 : 1;
 		image.style.opacity = opp;
 		animatingDOMs.push({anim: "fade", id: imgId, fadeIn: fadeIn, time: time, currOp: opp});
 	}
@@ -311,24 +321,31 @@ function getIdIndex(arr, val){
 
 function cutscene(imgId, scale, zIndex, linetext, scenenum){
 
-	showImage(imgId, scale, 0, 0, zIndex, 5000, true);
+	showImage(imgId, scale, 0, 0, zIndex, 2000, true);
 	var currLine = 0;
 	var startTime = tickCount;
 
-	displayText(currLine+"cutscene"+scenenum, linetext[currLine], 20, 200, 800, false, "red", "black", true, 1);
-	displayButton("continuecutbutt","Continuar", 800, 200, "black", true);
-	/*
-	document.getElementById("continuecutbutt").onclick = function() {
-		if ((tickCount - startTime) < linetext[currLine].length){
-			animatingDOMs[].skip = true;
-		}
-		else if {
-			displayText(currLine+"cutscene"+scenenum, linetext[currLine], 20, 200, 800, false, "red", "black", true, 1);
-			displayButton("continuecutbutt","Continuar", 800, 200, "black", true);
-		}
-	};
+	function write() {
+		if (document.getElementById(currLine-1+"cutscene"+scenenum))
+			document.getElementById(currLine-1+"cutscene"+scenenum).style.display = "none";
+		displayText(currLine+"cutscene"+scenenum, linetext[currLine], 40, 100, 530, false, "red", "black", true, 1);
+		currLine++;
+	}
 
-	*/
+	function disappear() {
+		showImage(imgId, 1, 0, 0, zIndex, 2000, false);
+		document.getElementById(currLine-1+"cutscene"+scenenum).style.display = "none";
+		cutsceneboolarr[scenenum] = false;
+	}
+
+	var bankedtime = 0;
+	for (var i = 0; i < linetext.length; i++){
+		bankedtime += (linetext[i].length/20)*1000 + 300;
+		setTimeout(write, bankedtime);
+	}
+	bankedtime += (linetext[linetext.length-1].length/20)*1000 + 300;
+	setTimeout(disappear, bankedtime);
+	return bankedtime + 1100;
 
 }
 
@@ -344,6 +361,7 @@ function initInventory(){
 
 function displayInventory(){
 	document.getElementById("moneyvalue").innerHTML =  "Quetzales: " + money.toFixed(2);
+	document.getElementById("moneyvalue").style.display = "inline";
 	for (var i = 0; i < cropArr.length; i++){
 		var tempelem = document.getElementById(cropArr[i] + "value");
 		tempelem.innerHTML = cropArrToSpanish[i] + ": " + cropVals[i];
@@ -392,7 +410,7 @@ function sellCrops(i){
 
 function purchaseStall(i){
 
-	var stallCost = Math.round((cropArrPrices[i] * 1000)*100)/100;
+	var stallCost = Math.round((cropArrPrices[i] * 10000)*100)/100;
 	var cityIndex = getCityIndex(currentcityId);
 
 	if (money >= stallCost){
@@ -400,8 +418,6 @@ function purchaseStall(i){
 		cityCrops[cityIndex].cropbool[i] = true;
 		walkToMarket();
 	}
-
-
 }
 
 function displayMarketOptions(){
@@ -421,7 +437,7 @@ function displayMarketOptions(){
 			var ratio = 150/tempImg.height;
 
 			if (ratio*tempImg.width > 140){
-				tempScale = 140 / tempImg.width;
+				var tempScale = 140 / tempImg.width;
 				tempY = 100-(tempScale*tempImg.height);
 			}
 			else {
@@ -438,7 +454,7 @@ function displayMarketOptions(){
 		}
 		else { 
 
-			displayText(cropArr[i]+"createplottext", "Costo de Constuir: " + Math.round((cropArrPrices[i] * 1000)*100)/100, 20, 160+xOffset, 20 + currNumCrop*150+yOffset, true, "white", "black")
+			displayText(cropArr[i]+"createplottext", "Costo de Constuir: " + Math.round((cropArrPrices[i] * 10000)*100)/100, 20, 160+xOffset, 20 + currNumCrop*150+yOffset, true, "white", "black")
 			displayButton(cropArr[i]+"createplot", "Construir", 180+xOffset, 80 + currNumCrop*150+yOffset, true);
 			currNumCrop++;
 			(function(i) {
@@ -459,6 +475,7 @@ function displayCropImages(){
 	xOffset = 0,
 	yOffset = 0;
 
+
 	for (var i = 0; i < cityCrops[cityIndex].cropbool.length; i++){
 		if (cityCrops[cityIndex].cropbool[i]){
 			var tempY = 0;
@@ -468,7 +485,7 @@ function displayCropImages(){
 			var ratio = 150/tempImg.height;
 
 			if (ratio*tempImg.width > 140){
-				tempScale = 140 / tempImg.width;
+				var tempScale = 140 / tempImg.width;
 				tempY = 100-(tempScale*tempImg.height);
 			}
 			else {
@@ -490,18 +507,105 @@ function displayCropImages(){
 
 }
 
+function purchaseBlackMarket(i){
+
+	if (money >= BMInfo[i].price){
+		money-=BMInfo[i].price;
+		BMInfo[i].purchased = true;
+	}
+}
+
 function blackMarket(){
 	disableDOMs();
 	showImage("cities/undergroundmarket", 1.5, 0, 0, 0);
 	if (cutsceneboolarr[0]){
-		var lineText = ["Ay, ¿Quién crees que eres?", "No debes estar aquí si no es necesario.", "Adelántese entonces, pero ten cuiado..."];
-		cutscene("cities/shadymerchant", 1.2, 1, lineText, 0);
+		var lineText = ["Ay, ¿Quién crees que eres?", "No debes estar aquí si no es necesario.", "Adelántese entonces, pero ten cuidado..."];
+		setTimeout(shopping, cutscene("cities/shadymerchant", 1.2, 1, lineText, 0));
 	}
-	
-	initInventory();
-	
+	else {
+		shopping();
+	}
 
+	function shopping(){
+		initInventory();
+		displayText("bmtext", "Estás en el mercado NEGRO.", 60, 90, 575, false, "red", "transparent", true, 1);
+		var
+		currVal = 0,
+		xOffset = 0,
+		yOffset = 0;
+		
+
+		for (var i = 0; i < BMInfo.length; i++){
+			var tempY = 0;
+
+			var tempImg = document.getElementById(BMInfo[i].imgId);
+
+			var ratio = 150/tempImg.height;
+
+			if (ratio*tempImg.width > 140){
+				var tempScale = 140 / tempImg.width;
+				tempY = 100-(tempScale*tempImg.height);
+			}
+			else {
+				tempScale = ratio;
+			}
+
+			showImage(BMInfo[i].imgId, tempScale, 15+xOffset, 20 + tempY + currVal*150+yOffset, 1);
+
+			if (!BMInfo[i].purchased){
+				displayButton(BMInfo[i].imgId+"purchase", "Comprar", 180+xOffset, 80 + currVal*150+yOffset, false);
+				tempStr = "";
+				(function(i) {
+					document.getElementById(BMInfo[i].imgId+"purchase").onclick = function() {	
+						purchaseBlackMarket(i);
+						blackMarket();
+					};
+				})(i);
+			}
+			else {
+				displayText(BMInfo[i].imgId+"alreadybought", "Ya lo compraste", 20, 180+xOffset, 80 + currVal*150+yOffset, true, "white", "black");
+			}
+			
+			displayText(BMInfo[i].imgId+"price", "Un(a) " + BMInfo[i].spanishName + ": " + BMInfo[i].price, 20, 170+xOffset, 20 + currVal*150+yOffset, true, "white", "black");
+			currVal++;
+			if (currVal > 3) {xOffset = 450; yOffset = -600;}
+		}
+
+		displayButton("leaveBMbutton", "Salir", 1065, 550, true, "black");
+		document.getElementById("leaveBMbutton").onclick = function() { walkToMarket(); };
+	}
 }
+
+function travelTo(i){
+	currentcityId = circles[i].id;
+	youAreIn("cities/"+currentcityId);
+}
+
+function viewMap(){
+
+	disableDOMs();
+
+	showImage("guatemalamap", 1, 0, 0, 0);
+	if (BMInfo[1].purchased){
+		for (var i = 0; i < circles.length; i++){
+			document.getElementById(circles[i].id).style.display = "inline";
+			displayedGraphics.push(circles[i].id);
+			(function(i) {
+				document.getElementById(circles[i].id).onclick = function() { travelTo(i); };
+			})(i); 
+		}
+	} else {
+		for (var i = 3; i < 5; i++){
+
+			document.getElementById(circles[i].id).style.display = "inline";
+			displayedGraphics.push(circles[i].id);
+			(function(i) {
+				document.getElementById(circles[i].id).onclick = function() { travelTo(i); };
+			})(i); 
+			}
+		}
+	}
+
 
 function walkToMarket(){
 	disableDOMs();
@@ -521,11 +625,19 @@ function walkToMarket(){
 
 function initBasicButtons(){
 
-	displayText("market", "Al mercado", 30, 1050, 500, true, "black");
+	displayText("market", "Al mercado", 30, 1050, 515, true, "black");
 	displayButton("marketbutton", "Caminar", 1065, 550, true, "black");
 	document.getElementById("marketbutton").onclick = function() { 
 		walkToMarket();
 	};
+	if (BMInfo[0].purchased){
+		displayText("maptext", "La mapa", 30, 1050, 415, true, "black");
+		displayButton("mapbutton", "Mirar", 1065, 450, true, "black");
+		document.getElementById("mapbutton").onclick = function() { 
+			viewMap();
+		};
+	}	
+
 
 }
 
@@ -542,20 +654,10 @@ function youAreIn(cityId){
 	initInventory();
 	initBasicButtons();
 
-	if(hasMap){
-
-	}
-
 
 }
 
-	/* Display guatemala + nodes
-	showImage("guatemala", 1, 0, 0);
-	for (var i = 0; i < circles.length; i++){
-		var town = document.getElementById(circles[i].id);
-		town.style.display = "inline";
-	}
-	*/
+
 
 function run(){
 	setInterval(function() { tick(); }, 50);

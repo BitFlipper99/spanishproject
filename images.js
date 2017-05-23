@@ -158,7 +158,7 @@ var cityCrops = [
 
 
 var
-money = 100;
+money = 3;
 cropVals = [
 	corn = 0,
 	bananas = 0,

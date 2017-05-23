@@ -207,7 +207,7 @@ function tick(){
 
 	for (var i = 0; i < cityCrops[0].cropbool.length; i++){
 		for (var j = 0; j < cropVals.length; j++){
-			if (cityCrops[j].cropbool[i]){
+			if (cityCrops[j].harvesters[i] > 0){
 
 				cropArrPrices[i] += 0.000005;
 				break;

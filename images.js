@@ -649,7 +649,7 @@ function youAreIn(cityId){
 	var imgStretch = 1000/cityImg.width;
 	
 	showImage(cityId, imgStretch, 0, 0, 0);
-	displayText("citytext", "Estás en la ciudad de " + currentcityId + ".", 60, 90, 575, false, "white", "transparent", true, 1);
+	displayText("citytext", "Estás en la ciudad de " + currentcityId + ".", 50, 60, 575, false, "white", "transparent", true, 1);
 	displayCropImages();
 	initInventory();
 	initBasicButtons();

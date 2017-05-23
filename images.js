@@ -188,7 +188,10 @@ tickCount = 0;
 
 
 function tick(){	
+
 	tickCount++;
+	deviceScale = document.documentElement.clientWidth / 1536;
+
 	displayInventory();
 	for (var i = 0; i < cropVals.length; i++){
 		var sumHarvesters = 0;
@@ -684,6 +687,14 @@ function startgame(male){
 
 
 function begingame(){
+
+	deviceScale = document.documentElement.clientWidth / 1536;
+
+	setTimeout(function(){
+		// Hide the address bar!
+		window.scrollTo(0, 1);
+	}, 0);
+
 
 	showImage("farmercat", 1.5, 0, 160, 0);
 

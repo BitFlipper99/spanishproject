@@ -210,7 +210,6 @@ function tick(){
 		if (animatingDOMs[i].anim == "fade"){
 			var rate = 50 / animatingDOMs[i].time;
 			var currOp = animatingDOMs[i].currOp;
-			console.log(currOp);
 			if (animatingDOMs[i].fadeIn){
 				currOp += rate;
 				document.getElementById(animatingDOMs[i].id).style.opacity = currOp;
@@ -231,9 +230,8 @@ function tick(){
 
 		}
 		else if (animatingDOMs[i].anim == "type"){
-			if (tickCount % 2 == 0){
+			if (tickCount % animatingDOMs[i].rate == 0){
 
-				console.log("hello");
 				animatingDOMs[i].currstr += animatingDOMs[i].text.charAt(animatingDOMs[i].currind);
 				animatingDOMs[i].currind++;
 
@@ -249,7 +247,7 @@ function tick(){
 
 }
 
-function displayText(id, text, size, x, y, isBold, color, backgroundColor, typed){
+function displayText(id, text, size, x, y, isBold, color, backgroundColor, typed, rate){
 
 	if (document.getElementById(id)){
 		var sampleText = document.getElementById(id);
@@ -276,9 +274,8 @@ function displayText(id, text, size, x, y, isBold, color, backgroundColor, typed
 	}	
 
 	if (typed){
-		console.log("this woroked");
 		sampleText.innerHTML = "";
-		animatingDOMs.push({anim: "type", id: id, text: text, currstr: "", currind: 0});
+		animatingDOMs.push({anim: "type", id: id, text: text, currstr: "", currind: 0, rate: rate, skip: false});
 	}
 
 }
@@ -298,17 +295,40 @@ function showImage(imgId, imgScale, x, y, zIndex, time, fadeIn) {
 	if (time) {
 		var currAnnInd = animatingDOMs.length-1;
 		var opp = (fadeIn) ? 0 : 100;
-		console.log(opp);
 		image.style.opacity = opp;
 		animatingDOMs.push({anim: "fade", id: imgId, fadeIn: fadeIn, time: time, currOp: opp});
 	}
 }
 
+function getIdIndex(arr, val){
+	for (var i = 0; i < arr.length; i++){
+		if (val === arr[i].id)
+			return i;
+	}
+	console.log("error");
+	return -1;
+}
 
-function cutscene(imgId, scale, zIndex, linetext){
+function cutscene(imgId, scale, zIndex, linetext, scenenum){
 
 	showImage(imgId, scale, 0, 0, zIndex, 5000, true);
+	var currLine = 0;
+	var startTime = tickCount;
 
+	displayText(currLine+"cutscene"+scenenum, linetext[currLine], 20, 200, 800, false, "red", "black", true, 1);
+	displayButton("continuecutbutt","Continuar", 800, 200, "black", true);
+	/*
+	document.getElementById("continuecutbutt").onclick = function() {
+		if ((tickCount - startTime) < linetext[currLine].length){
+			animatingDOMs[].skip = true;
+		}
+		else if {
+			displayText(currLine+"cutscene"+scenenum, linetext[currLine], 20, 200, 800, false, "red", "black", true, 1);
+			displayButton("continuecutbutt","Continuar", 800, 200, "black", true);
+		}
+	};
+
+	*/
 
 }
 
@@ -346,7 +366,6 @@ function getCityIndex(cityname){
 
 function purchaseHarvester(cityIndex, cropIndex){
 
-	console.log("worked " + cityIndex + " " + cropIndex);
 
 	var
 	harvesters = cityCrops[cityIndex].harvesters[cropIndex],
@@ -376,12 +395,9 @@ function purchaseStall(i){
 	var stallCost = Math.round((cropArrPrices[i] * 1000)*100)/100;
 	var cityIndex = getCityIndex(currentcityId);
 
-	console.log(stallCost + " " + i);
-
 	if (money >= stallCost){
 		money-=stallCost;
 		cityCrops[cityIndex].cropbool[i] = true;
-		console.log("test");
 		walkToMarket();
 	}
 
@@ -479,7 +495,7 @@ function blackMarket(){
 	showImage("cities/undergroundmarket", 1.5, 0, 0, 0);
 	if (cutsceneboolarr[0]){
 		var lineText = ["Ay, ¿Quién crees que eres?", "No debes estar aquí si no es necesario.", "Adelántese entonces, pero ten cuiado..."];
-		cutscene("cities/shadymerchant", 1.2, 1, lineText);
+		cutscene("cities/shadymerchant", 1.2, 1, lineText, 0);
 	}
 	
 	initInventory();
@@ -492,7 +508,7 @@ function walkToMarket(){
 	initInventory();
 	showImage("cities/SpanishMarket", 2, 0, 0, 0);
 	displayButton("leavemarketbutton", "Salir", 1065, 550, true, "black");
-	displayText("markettext", "Estás en el mercado.", 60, 90, 575, false, "black", "transparent", true);
+	displayText("markettext", "Estás en el mercado.", 60, 90, 575, false, "black", "transparent", true, 1);
 	if (money > 10){
 		displayText("blackmarkettext", "Mercado Negro", 40, 1000, 430, true, "red", "black");
 		displayButton("blackmarketbutton", "Cuidate", 1065, 480, true, "black");
@@ -521,7 +537,7 @@ function youAreIn(cityId){
 	var imgStretch = 1000/cityImg.width;
 	
 	showImage(cityId, imgStretch, 0, 0, 0);
-	displayText("citytext", "Estás en la ciudad de " + currentcityId + ".", 60, 90, 575, false, "white", "transparent", true);
+	displayText("citytext", "Estás en la ciudad de " + currentcityId + ".", 60, 90, 575, false, "white", "transparent", true, 1);
 	displayCropImages();
 	initInventory();
 	initBasicButtons();
